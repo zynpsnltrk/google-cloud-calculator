@@ -66,6 +66,6 @@ if __name__ == "__main__":
         cpu = round(project.get_resources("guestCpus"))
         print("The total cpu size in {} is {} cores.".format(args.project, cpu))
     if args.memory:
-        memory = round(project.get_resources("memoryMb")/1000)
+        memory = round(project.get_resources("memoryMb")/1000,2)
         print("The total memory size in {} is {} GB.".format(args.project, memory))
 
