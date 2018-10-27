@@ -3,15 +3,15 @@ from googleapiclient import discovery
 from oauth2client.client import GoogleCredentials
 
 
-class GCResourceCalculator():
+class GCResourceCalculator(object):
     instances = []
-    compute = discovery.build('compute', 'v1')
-    credentials = GoogleCredentials.get_application_default()
-    service = discovery.build('compute', 'v1', credentials=credentials)
     machine_types = []
 
-    def __init__(self, project, zone):
-        self.project = project
+    def __init__(self, _project, zone):
+        self.compute = discovery.build('compute', 'v1')
+        self.credentials = GoogleCredentials.get_application_default()
+        self.service = discovery.build('compute', 'v1', credentials=self.credentials)
+        self.project = _project
         self.zone = zone
         self._get_instances()
         self._get_machine_types()
@@ -44,10 +44,12 @@ class GCResourceCalculator():
                     break
         return sum_resources
 
-    def _calculate_custom_cpu(self, item):
+    @staticmethod
+    def _calculate_custom_cpu(item):
         return float(item.split('-')[1])
 
-    def _calculate_custom_memory(self, item):
+    @staticmethod
+    def _calculate_custom_memory(item):
         return float(item.split('-')[2])
 
 
@@ -68,4 +70,3 @@ if __name__ == "__main__":
     if args.memory:
         memory = round(project.get_resources("memoryMb")/1000,2)
         print("The total memory size in {} is {} GB.".format(args.project, memory))
-

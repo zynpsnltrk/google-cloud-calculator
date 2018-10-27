@@ -1,0 +1,55 @@
+#!/usr/bin/env python
+"""
+Google Cloud Calculator
+"""
+
+import argparse
+from gc_resource_calculator import GCResourceCalculator
+
+
+parser = argparse.ArgumentParser(description='Google Cloud Calculator.')
+parser.add_argument('tool', type=str, help="Calculation tool: memory, cpu, price.")
+parser.add_argument("-p", "--project", help="Google Cloud PROJECT_ID.", type=str, required=False)
+parser.add_argument("-z", "--zone", help="Google Cloud ZONE.", type=str, required=False)
+# @TODO parser.add_argument("--all-zones", help="Calculate for all Zones.", action="store_true")
+
+
+def memory_resource_calculator(options):
+    """Calculate memory resource usage."""
+    zone = options['zone']
+    project = options['project']
+    if not project:
+        raise ValueError("Project is required. Use -h for help.")
+    if not zone:
+        raise ValueError("Zone is required. Use -h for help.")
+    gcrc = GCResourceCalculator(project, zone)
+    return round(gcrc.get_resources("memoryMb")/1000, 2)
+
+
+def cpu_resource_calculator(options):
+    """Calculate cpu resource usage."""
+    zone = options['zone']
+    project = options['project']
+    if not project:
+        raise ValueError("Project is required. Use -h for help.")
+    if not zone:
+        raise ValueError("Zone is required. Use -h for help.")
+    gcrc = GCResourceCalculator(project, zone)
+    return round(gcrc.get_resources("guestCpus"), 2)
+
+
+if __name__ == '__main__':
+    args = vars(parser.parse_args())
+    tool = args['tool']
+    if tool == 'memory':
+        print("The total memory size in {project} is {size} GB.".format(
+            project=args['project'], size=memory_resource_calculator(args)
+        ))
+    elif tool == 'cpu':
+        print("The total cpu size in {project} is {size} cores.".format(
+            project=args['project'], size=cpu_resource_calculator(args)
+        ))
+    elif tool == 'price':
+        raise NotImplementedError("Price calculator not implemented yet.")
+    else:
+        raise ValueError("{tool} not found. Available tools: memory, cpu, price.".format(tool=tool))
